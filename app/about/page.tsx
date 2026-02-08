@@ -1,0 +1,79 @@
+import { Fish, Clock, Award, Users, Truck, Heart } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link"
+import { Navigation } from "@/components/navigation"
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen bg-background">
+         <Navigation />
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 bg-gradient-to-br from-primary/5 to-primary/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+            <Fish className="w-8 h-8 text-primary-foreground" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6 text-balance">
+            About JEMJOD
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+            Your trusted source for right preserved foods, delivered daily from the coast to your kitchen.
+          </p>
+        </div>
+      </section>
+
+      {/* Story Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-serif font-bold text-foreground mb-6">Our Story</h2>
+              <div className="space-y-4 text-muted-foreground">
+                <p>
+                  Founded in 2019, JEMJOD Limited began as a small family business with a simple mission: to bring the
+                  freshest, highest-quality fish and seafood directly from local fishermen to your table.
+                </p>
+                <p>
+                  What started as a single stall in the local market has grown into a trusted name in fresh seafood,
+                  serving thousands of families across the region. We maintain the same commitment to quality and
+                  freshness that our founders established nearly four decades ago.
+                </p>
+                <p>
+                  Every morning before dawn, our team works with local fishermen to select only the finest catch of the
+                  day, ensuring that what reaches your kitchen is as fresh as the ocean breeze.
+                </p>
+              </div>
+            </div>
+            <div className="relative">
+              <img
+                src="/owner.jpg"
+                alt="Fresh fish market display"
+                className="rounded-lg shadow-lg w-full h-80 object-cover"
+              />
+              <h6 className="text-2xl text-center font-serif font-bold text-foreground mb-6">Mrs Darasimi Olagunju</h6>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* CTA Section */}
+      <section className="py-16 px-4 bg-primary/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-serif font-bold text-foreground mb-4">Ready to Experience our Products?</h2>
+          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Order now and taste the difference quality makes.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg">
+              <Link href="/products">Shop Here</Link>
+            </Button>
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/contact">Contact Us</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
