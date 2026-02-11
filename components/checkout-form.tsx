@@ -88,6 +88,11 @@ export function CheckoutForm() {
       const data = await response.json()
 
       if (response.ok) {
+        console.log("[v0] Order saved successfully, sending emails...")
+        
+        let customerEmailSent = false
+        let adminEmailSent = false
+
         // Send customer confirmation email
         if (data.customerEmailHTML) {
           try {
@@ -100,9 +105,10 @@ export function CheckoutForm() {
                 order_html: data.customerEmailHTML,
               }
             )
-            console.log("[v0] Customer email sent successfully")
-          } catch (emailError) {
-            console.error("[v0] Error sending customer email:", emailError)
+            console.log("[v0] Customer email sent successfully to", formData.email)
+            customerEmailSent = true
+          } catch (emailError: any) {
+            console.error("[v0] Error sending customer email:", emailError?.message || emailError)
           }
         }
 
@@ -118,9 +124,10 @@ export function CheckoutForm() {
                 order_html: data.adminEmailHTML,
               }
             )
-            console.log("[v0] Admin email sent successfully")
-          } catch (emailError) {
-            console.error("[v0] Error sending admin email:", emailError)
+            console.log("[v0] Admin email sent successfully to", process.env.NEXT_PUBLIC_ADMIN_EMAIL)
+            adminEmailSent = true
+          } catch (emailError: any) {
+            console.error("[v0] Error sending admin email:", emailError?.message || emailError)
           }
         }
 
@@ -139,8 +146,8 @@ export function CheckoutForm() {
       } else {
         throw new Error(data.message || "Failed to submit order")
       }
-    } catch (error) {
-      console.error("[v0] Order submission error:", error)
+    } catch (error: any) {
+      console.error("[v0] Order submission error:", error?.message || error)
       alert("There was an error submitting your order. Please try again.")
     } finally {
       setIsSubmitting(false)
