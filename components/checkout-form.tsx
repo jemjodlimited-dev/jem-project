@@ -48,6 +48,12 @@ export function CheckoutForm() {
       return
     }
 
+    // Validate form
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.address || !formData.city || !formData.zipCode || !formData.country) {
+      alert("Please fill in all required fields")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -60,6 +66,8 @@ export function CheckoutForm() {
         orderDate: new Date().toISOString(),
       }
 
+      console.log("[v0] Submitting order:", orderData)
+
       // Send email via API route
       const response = await fetch("/api/send-order", {
         method: "POST",
@@ -68,6 +76,8 @@ export function CheckoutForm() {
         },
         body: JSON.stringify(orderData),
       })
+
+      const data = await response.json()
 
       if (response.ok) {
         setIsSuccess(true)
@@ -83,10 +93,10 @@ export function CheckoutForm() {
           country: "",
         })
       } else {
-        throw new Error("Failed to submit order")
+        throw new Error(data.message || "Failed to submit order")
       }
     } catch (error) {
-      console.error("Order submission error:", error)
+      console.error("[v0] Order submission error:", error)
       alert("There was an error submitting your order. Please try again.")
     } finally {
       setIsSubmitting(false)
@@ -213,15 +223,15 @@ export function CheckoutForm() {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
                 <span>Subtotal:</span>
-                <span>₦{totalPrice.toFixed(2)}</span>
+                <span>₦{totalPrice.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Tax:</span>
-                <span>₦{(totalPrice * 0.08).toFixed(2)}</span>
+                <span>₦{Math.round(totalPrice * 0.08).toLocaleString()}</span>
               </div>
               <div className="flex justify-between font-semibold">
                 <span>Total:</span>
-                <span>₦{(totalPrice * 1.08).toFixed(2)}</span>
+                <span>₦{Math.round(totalPrice * 1.08).toLocaleString()}</span>
               </div>
             </div>
 

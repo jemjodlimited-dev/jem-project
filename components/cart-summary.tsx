@@ -48,7 +48,7 @@ export function CartSummary() {
 
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium text-foreground truncate">{item.name}</h4>
-                <p className="text-sm text-muted-foreground">₦{item.price}</p>
+                <p className="text-sm text-muted-foreground">₦{parseInt(item.price.replace(/[^0-9]/g, "")).toLocaleString()}</p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export function CartSummary() {
               </div>
 
               <div className="text-right">
-                <p className="font-semibold text-foreground">₦{(item.price * item.quantity).toFixed(2)}</p>
+                <p className="font-semibold text-foreground">₦{(parseInt(item.price.replace(/[^0-9]/g, "")) * item.quantity).toLocaleString()}</p>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -87,7 +87,7 @@ export function CartSummary() {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₦{totalPrice.toFixed(2)}</span>
+              <span>₦{totalPrice.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Shipping</span>
@@ -95,12 +95,12 @@ export function CartSummary() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Tax</span>
-              <span>₦{(totalPrice * 0.08).toFixed(2)}</span>
+              <span>₦{Math.round(totalPrice * 0.08).toLocaleString()}</span>
             </div>
             <div className="border-t border-border pt-2">
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>₦{(totalPrice * 1.08).toFixed(2)}</span>
+                <span>₦{Math.round(totalPrice * 1.08).toLocaleString()}</span>
               </div>
             </div>
           </div>
