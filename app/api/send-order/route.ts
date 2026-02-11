@@ -1,4 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
+import emailjs from "@emailjs/nodejs"
+
+// Initialize EmailJS with your credentials
+emailjs.init({
+  publicKey: process.env.EMAILJS_PUBLIC_KEY,
+  privateKey: process.env.EMAILJS_PRIVATE_KEY,
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -125,13 +132,39 @@ export async function POST(request: NextRequest) {
       </div>
     `
 
-    // For development: just log and return success
-    // In production, integrate with EmailJS or your email service
-    console.log("[v0] Customer email HTML generated")
-    console.log("[v0] Admin email HTML generated")
+    // Send confirmation email to customer
+    try {
+      await emailjs.send(
+        process.env.EMAILJS_SERVICE_ID!,
+        process.env.EMAILJS_CUSTOMER_TEMPLATE_ID!,
+        {
+          customer_email: orderData.customer.email,
+          customer_name: orderData.customer.fullName,
+          order_html: customerEmailHTML,
+          to_email: orderData.customer.email,
+        }
+      )
+      console.log("[v0] Customer confirmation email sent successfully")
+    } catch (emailError) {
+      console.error("[v0] Error sending customer email:", emailError)
+    }
 
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Send notification email to admin
+    try {
+      await emailjs.send(
+        process.env.EMAILJS_SERVICE_ID!,
+        process.env.EMAILJS_ADMIN_TEMPLATE_ID!,
+        {
+          admin_email: process.env.ADMIN_EMAIL,
+          customer_name: orderData.customer.fullName,
+          order_html: adminEmailHTML,
+          to_email: process.env.ADMIN_EMAIL,
+        }
+      )
+      console.log("[v0] Admin notification email sent successfully")
+    } catch (emailError) {
+      console.error("[v0] Error sending admin email:", emailError)
+    }
 
     return NextResponse.json({ 
       success: true, 
@@ -144,5 +177,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
 }
