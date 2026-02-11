@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import emailjs from "@emailjs/browser"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -34,6 +35,13 @@ export function CheckoutForm() {
     zipCode: "",
     country: "",
   })
+
+  // Initialize EmailJS
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
+      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+    }
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -68,7 +76,7 @@ export function CheckoutForm() {
 
       console.log("[v0] Submitting order:", orderData)
 
-      // Send email via API route
+      // Get email HTML from API route
       const response = await fetch("/api/send-order", {
         method: "POST",
         headers: {
@@ -80,6 +88,42 @@ export function CheckoutForm() {
       const data = await response.json()
 
       if (response.ok) {
+        // Send customer confirmation email
+        if (data.customerEmailHTML) {
+          try {
+            await emailjs.send(
+              process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+              process.env.NEXT_PUBLIC_EMAILJS_CUSTOMER_TEMPLATE_ID || "",
+              {
+                to_email: formData.email,
+                customer_name: formData.fullName,
+                order_html: data.customerEmailHTML,
+              }
+            )
+            console.log("[v0] Customer email sent successfully")
+          } catch (emailError) {
+            console.error("[v0] Error sending customer email:", emailError)
+          }
+        }
+
+        // Send admin notification email
+        if (data.adminEmailHTML) {
+          try {
+            await emailjs.send(
+              process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+              process.env.NEXT_PUBLIC_EMAILJS_ADMIN_TEMPLATE_ID || "",
+              {
+                to_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
+                customer_name: formData.fullName,
+                order_html: data.adminEmailHTML,
+              }
+            )
+            console.log("[v0] Admin email sent successfully")
+          } catch (emailError) {
+            console.error("[v0] Error sending admin email:", emailError)
+          }
+        }
+
         setIsSuccess(true)
         clearCart()
         // Reset form
