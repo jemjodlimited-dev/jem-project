@@ -88,37 +88,47 @@ export function CheckoutForm() {
 
       if (response.ok) {
         // Send customer confirmation email
-        if (data.customerEmailHTML) {
-          try {
-            await emailjs.send(
-              process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
-              process.env.NEXT_PUBLIC_EMAILJS_CUSTOMER_TEMPLATE_ID || "",
-              {
-                to_email: formData.email,
-                customer_name: formData.fullName,
-                order_html: data.customerEmailHTML,
-              }
-            )
-          } catch (emailError) {
-            // Email sending failed but order was still submitted
-          }
+        try {
+          await emailjs.send(
+            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+            process.env.NEXT_PUBLIC_EMAILJS_CUSTOMER_TEMPLATE_ID || "",
+            {
+              to_email: formData.email,
+              customer_name: data.customer_name,
+              customer_email: data.customer_email,
+              customer_phone: data.customer_phone,
+              customer_address: data.full_address,
+              items_list: data.items_list,
+              subtotal: data.subtotal,
+              tax: data.tax,
+              total: data.total,
+              order_date: data.order_date,
+            }
+          )
+        } catch (emailError) {
+          // Email sending failed but order was still submitted
         }
 
         // Send admin notification email
-        if (data.adminEmailHTML) {
-          try {
-            await emailjs.send(
-              process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
-              process.env.NEXT_PUBLIC_EMAILJS_ADMIN_TEMPLATE_ID || "",
-              {
-                to_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
-                customer_name: formData.fullName,
-                order_html: data.adminEmailHTML,
-              }
-            )
-          } catch (emailError) {
-            // Email sending failed but order was still submitted
-          }
+        try {
+          await emailjs.send(
+            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+            process.env.NEXT_PUBLIC_EMAILJS_ADMIN_TEMPLATE_ID || "",
+            {
+              to_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
+              customer_name: data.customer_name,
+              customer_email: data.customer_email,
+              customer_phone: data.customer_phone,
+              customer_address: data.full_address,
+              items_list: data.items_list,
+              subtotal: data.subtotal,
+              tax: data.tax,
+              total: data.total,
+              order_date: data.order_date,
+            }
+          )
+        } catch (emailError) {
+          // Email sending failed but order was still submitted
         }
 
         setIsSuccess(true)
