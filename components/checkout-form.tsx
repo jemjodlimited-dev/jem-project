@@ -176,9 +176,8 @@ export function CheckoutForm() {
           </div>
         </DialogContent>
       </Dialog>
-    
-    <
-    <Card>
+
+      <Card>
       <CardHeader>
         <CardTitle className="font-serif text-xl">Checkout Details</CardTitle>
       </CardHeader>
