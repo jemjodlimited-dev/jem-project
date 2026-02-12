@@ -38,8 +38,19 @@ export function CheckoutForm() {
 
   // Initialize EmailJS
   useEffect(() => {
+    console.log("[v0] Initializing EmailJS...")
+    console.log("[v0] Public Key available:", !!process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+    console.log("[v0] Public Key value:", process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ? "✓ Set" : "✗ Not Set")
+    
     if (process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
-      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+      try {
+        emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+        console.log("[v0] EmailJS initialized successfully")
+      } catch (error) {
+        console.error("[v0] Failed to initialize EmailJS:", error)
+      }
+    } else {
+      console.warn("[v0] NEXT_PUBLIC_EMAILJS_PUBLIC_KEY is not set. Please add it to your environment variables.")
     }
   }, [])
 
