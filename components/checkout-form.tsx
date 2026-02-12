@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useCart } from "@/hooks/use-cart"
 import { Loader2, CheckCircle } from "lucide-react"
 
@@ -38,19 +39,8 @@ export function CheckoutForm() {
 
   // Initialize EmailJS
   useEffect(() => {
-    console.log("[v0] Initializing EmailJS...")
-    console.log("[v0] Public Key available:", !!process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
-    console.log("[v0] Public Key value:", process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ? "✓ Set" : "✗ Not Set")
-    
     if (process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
-      try {
-        emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
-        console.log("[v0] EmailJS initialized successfully")
-      } catch (error) {
-        console.error("[v0] Failed to initialize EmailJS:", error)
-      }
-    } else {
-      console.warn("[v0] NEXT_PUBLIC_EMAILJS_PUBLIC_KEY is not set. Please add it to your environment variables.")
+      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
     }
   }, [])
 
@@ -85,8 +75,6 @@ export function CheckoutForm() {
         orderDate: new Date().toISOString(),
       }
 
-      console.log("[v0] Submitting order:", orderData)
-
       // Get email HTML from API route
       const response = await fetch("/api/send-order", {
         method: "POST",
@@ -99,11 +87,6 @@ export function CheckoutForm() {
       const data = await response.json()
 
       if (response.ok) {
-        console.log("[v0] Order saved successfully, sending emails...")
-        
-        let customerEmailSent = false
-        let adminEmailSent = false
-
         // Send customer confirmation email
         if (data.customerEmailHTML) {
           try {
@@ -116,10 +99,8 @@ export function CheckoutForm() {
                 order_html: data.customerEmailHTML,
               }
             )
-            console.log("[v0] Customer email sent successfully to", formData.email)
-            customerEmailSent = true
-          } catch (emailError: any) {
-            console.error("[v0] Error sending customer email:", emailError?.message || emailError)
+          } catch (emailError) {
+            // Email sending failed but order was still submitted
           }
         }
 
@@ -135,10 +116,8 @@ export function CheckoutForm() {
                 order_html: data.adminEmailHTML,
               }
             )
-            console.log("[v0] Admin email sent successfully to", process.env.NEXT_PUBLIC_ADMIN_EMAIL)
-            adminEmailSent = true
-          } catch (emailError: any) {
-            console.error("[v0] Error sending admin email:", emailError?.message || emailError)
+          } catch (emailError) {
+            // Email sending failed but order was still submitted
           }
         }
 
@@ -157,36 +136,48 @@ export function CheckoutForm() {
       } else {
         throw new Error(data.message || "Failed to submit order")
       }
-    } catch (error: any) {
-      console.error("[v0] Order submission error:", error?.message || error)
+    } catch (error) {
       alert("There was an error submitting your order. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (isSuccess) {
-    return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-8 h-8 text-primary" />
+  return (
+    <>
+      <Dialog open={isSuccess} onOpenChange={() => {
+        if (!isSuccess) setIsSuccess(false)
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
             </div>
-            <h3 className="font-serif font-semibold text-xl">Order Submitted!</h3>
-            <p className="text-muted-foreground">
-              Thank you for your order. We'll send you a confirmation email shortly.
-            </p>
-            <Button asChild>
-              <a href="/products">Continue Shopping</a>
+            <DialogTitle className="text-center font-serif text-2xl">Order Submitted Successfully!</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Thank you for your order. A confirmation email has been sent to <strong>{formData.email || 'your email'}</strong>. We'll process your order shortly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-6">
+            <Button onClick={() => {
+              setIsSuccess(false)
+              window.location.href = "/products"
+            }} className="w-full">
+              Continue Shopping
+            </Button>
+            <Button onClick={() => {
+              setIsSuccess(false)
+              window.location.href = "/"
+            }} variant="outline" className="w-full">
+              Back to Home
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
-  return (
+        </DialogContent>
+      </Dialog>
+    
+    <
     <Card>
       <CardHeader>
         <CardTitle className="font-serif text-xl">Checkout Details</CardTitle>
@@ -311,5 +302,6 @@ export function CheckoutForm() {
         </form>
       </CardContent>
     </Card>
+    </>
   )
 }
