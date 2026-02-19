@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@swc/helpers": "^0.5.0",
     "@emailjs/browser": "^4.3.1",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",
