@@ -123,6 +123,14 @@ export default function ProductsPage() {
   const [selectedVariations, setSelectedVariations] = useState<Record<number, string>>({})
 
   const handleAddToCart = async (product: Product) => {
+    // If product has variations, check if one is selected
+    if (product.variations && product.variations.length > 0) {
+      const selectedVariationId = selectedVariations[product.id]
+      if (!selectedVariationId) {
+        return
+      }
+    }
+
     setAddingToCart(product.id)
 
     try {
@@ -133,11 +141,6 @@ export default function ProductsPage() {
       // If product has variations, get the selected one
       if (product.variations && product.variations.length > 0) {
         const selectedVariationId = selectedVariations[product.id]
-        if (!selectedVariationId) {
-          alert("Please select a variation")
-          setAddingToCart(null)
-          return
-        }
         const selectedVariation = product.variations.find((v) => v.id === selectedVariationId)
         if (selectedVariation) {
           finalPrice = selectedVariation.price
@@ -230,7 +233,11 @@ export default function ProductsPage() {
                   <Button
                     size="sm"
                     onClick={() => handleAddToCart(product)}
-                    disabled={addingToCart === product.id || product.availability !== "In Stock"}
+                    disabled={
+                      addingToCart === product.id ||
+                      product.availability !== "In Stock" ||
+                      (product.variations && product.variations.length > 0 && !selectedVariations[product.id])
+                    }
                   >
                     {addingToCart === product.id ? "Adding..." : "Add to Cart"}
                   </Button>
