@@ -190,30 +190,30 @@ export default function ProductsPage() {
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-serif font-semibold text-xl text-card-foreground">{product.name}</h3>
-                  <Badge variant={product.availability === "In Stock" ? "default" : "secondary"}>
+              <div className="p-6 flex flex-col">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-sans font-semibold text-lg text-card-foreground leading-tight">{product.name}</h3>
+                  <Badge variant={product.availability === "In Stock" ? "default" : "secondary"} className="ml-2 flex-shrink-0">
                     {product.availability}
                   </Badge>
                 </div>
-                <p className="text-muted-foreground mb-2">{product.description}</p>
-                <p className="text-sm text-muted-foreground mb-4">Origin: {product.origin}</p>
+                <p className="font-sans text-sm text-muted-foreground mb-2 leading-relaxed">{product.description}</p>
+                <p className="font-sans text-xs text-muted-foreground mb-4">Origin: {product.origin}</p>
 
                 {/* Product Variations */}
                 {product.variations && product.variations.length > 0 && (
                   <div className="mb-4">
-                    <label className="text-sm font-medium text-foreground mb-2 block">Select Option</label>
+                    <label className="font-sans text-xs font-medium text-foreground mb-2 block">Select Option</label>
                     <Select
                       value={selectedVariations[product.id] || ""}
                       onValueChange={(value) => setSelectedVariations({ ...selectedVariations, [product.id]: value })}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full font-sans">
                         <SelectValue placeholder="Choose a variation" />
                       </SelectTrigger>
                       <SelectContent>
                         {product.variations.map((variation) => (
-                          <SelectItem key={variation.id} value={variation.id}>
+                          <SelectItem key={variation.id} value={variation.id} className="font-sans">
                             {variation.label} - ₦{variation.price} ({variation.details})
                           </SelectItem>
                         ))}
@@ -222,8 +222,8 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-2xl text-primary">
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
+                  <span className="font-sans font-bold text-xl text-primary">
                     ₦
                     {selectedVariations[product.id]
                       ? product.variations?.find((v) => v.id === selectedVariations[product.id])?.price ||
@@ -238,6 +238,7 @@ export default function ProductsPage() {
                       product.availability !== "In Stock" ||
                       (product.variations && product.variations.length > 0 && !selectedVariations[product.id])
                     }
+                    className="font-sans"
                   >
                     {addingToCart === product.id ? "Adding..." : "Add to Cart"}
                   </Button>
