@@ -90,10 +90,6 @@ export function CartSummary() {
               <span>₦{totalPrice.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Shipping</span>
-              <span>Free</span>
-            </div>
-            <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Tax</span>
               <span>₦{Math.round(totalPrice * 0.08).toLocaleString()}</span>
             </div>

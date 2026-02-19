@@ -51,7 +51,7 @@ const fishProducts: Product[] = [
     price: "150,000",
     image: "/oven.jpeg",
     description: "A great, sweet and succulent meat",
-    availability: "Limited",
+    availability: "In Stock",
     origin: "Nigeria",
     variations: [
       {
