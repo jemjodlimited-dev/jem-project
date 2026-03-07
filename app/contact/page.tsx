@@ -1,5 +1,4 @@
 import { Navigation } from "@/components/navigation"
-import { ContactForm } from "@/components/contact-form"
 
 export default function ContactPage() {
   return (
@@ -12,61 +11,61 @@ export default function ContactPage() {
           <div className="text-center">
             <h1 className="font-serif font-bold text-4xl sm:text-5xl text-foreground mb-4">Contact Us</h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Ready to order fresh fish? Have questions about our daily catch? Get in touch with us today.
+              Get in touch with JEMJOD Limited for all your inquiries and orders.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Contact Content */}
-      <section className="py-12">
+      {/* Company Information */}
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Info */}
-            <div className="space-y-8">
+          <div className="space-y-12">
+            <div>
+              <h2 className="font-serif font-semibold text-3xl text-foreground mb-4">JEMJOD Limited</h2>
+              <p className="text-muted-foreground leading-relaxed text-lg">
+                We pride ourselves on providing the freshest, highest-quality products. Whether you're looking to place an order or have any enquiries, we're here to help.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h2 className="font-serif font-semibold text-2xl text-foreground mb-4">Place Your Order</h2>
+                <h3 className="font-semibold text-foreground mb-3 text-lg">Address</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Ready to order fresh fish or have questions about our daily catch? Contact us to place your order or
-                  inquire about availability. We guarantee the freshest fish delivered to your door.
+                  43b Onifade Crescent Off Orona
+                  <br />
+                  New Oko-Oba Abule Egba
+                  <br />
+                  Lagos, Nigeria
                 </p>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium text-foreground mb-1">Email</h3>
-                  <p className="text-muted-foreground">orders@JEMJOD.com</p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-foreground mb-1">Phone</h3>
-                  <p className="text-muted-foreground">+2349033447991</p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-foreground mb-1">Market Location</h3>
-                  <p className="text-muted-foreground">
-                    JemJod Limited
-                    <br />
-                    43b Onifade Crescent Off Orona
-                    <br />
-                    New Oko-Oba Abule Egba
-                    <br />
-                    Lagos, Nigeria
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium text-foreground mb-1">Market Hours</h3>
-                  <p className="text-muted-foreground">
-                    Daily: 5:00 AM - 2:00 PM
-                    <br />
-                    (Fresh catch arrives at 5 AM)
-                  </p>
-                </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-3 text-lg">Market Hours</h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  Daily: 5:00 AM - 2:00 PM
+                  <br />
+                  <span className="text-sm">(Fresh catch arrives at 5 AM)</span>
+                </p>
               </div>
-            </div>
 
-            {/* Contact Form */}
-            <div>
-              <ContactForm />
+              <div>
+                <h3 className="font-semibold text-foreground mb-3 text-lg">Phone</h3>
+                <p className="text-muted-foreground">
+                  <a href="tel:+2349033447991" className="hover:text-primary transition-colors text-base">
+                    +2349033447991
+                  </a>
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-foreground mb-3 text-lg">Email</h3>
+                <p className="text-muted-foreground">
+                  <a href="mailto:orders@jemjod.com" className="hover:text-primary transition-colors text-base">
+                    orders@jemjod.com
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>

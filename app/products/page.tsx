@@ -3,11 +3,30 @@
 import { Navigation } from "@/components/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useCart } from "@/hooks/use-cart"
 import { useState } from "react"
 import Link from "next/link"
 
-const fishProducts = [
+interface ProductVariation {
+  id: string
+  label: string
+  price: string
+  details: string
+}
+
+interface Product {
+  id: number
+  name: string
+  price: string
+  image: string
+  description: string
+  availability: string
+  origin: string
+  variations?: ProductVariation[]
+}
+
+const fishProducts: Product[] = [
   {
     id: 1,
     name: "Yellow maize dried pap",
@@ -29,25 +48,59 @@ const fishProducts = [
   {
     id: 3,
     name: "Oven dried meat",
-    price: "1,500",
+    price: "150,000",
     image: "/oven.jpeg",
     description: "A great, sweet and succulent meat",
-    availability: "Limited",
+    availability: "In Stock",
     origin: "Nigeria",
+    variations: [
+      {
+        id: "meat-local",
+        label: "Full Local Meat",
+        price: "150,000",
+        details: "Premium local meat",
+      },
+      {
+        id: "meat-rago",
+        label: "Full Rago Meat",
+        price: "100,000",
+        details: "Quality rago meat",
+      },
+    ],
   },
   {
     id: 4,
     name: "Oven dried catfish",
-    price: "16,000/kg",
+    price: "35,000",
     image: "/fish.jpeg",
     description: "Amazing Oven dried catfish",
     availability: "In Stock",
     origin: "Nigeria",
+    variations: [
+      {
+        id: "catfish-big",
+        label: "Big Size",
+        price: "35,000",
+        details: "1kg (10-15 pieces)",
+      },
+      {
+        id: "catfish-medium",
+        label: "Medium Size",
+        price: "35,000",
+        details: "1.2kg (18-20 pieces)",
+      },
+      {
+        id: "catfish-small",
+        label: "Small Size",
+        price: "35,000",
+        details: "1.5kg (20-25 pieces)",
+      },
+    ],
   },
   {
     id: 5,
     name: "Oven dried snail",
-    price: "9000/kg",
+    price: "9,000/kg",
     image: "/snail.jpeg",
     description: "Fresh dried snail",
     availability: "In Stock",
@@ -67,17 +120,41 @@ const fishProducts = [
 export default function ProductsPage() {
   const { addItem } = useCart()
   const [addingToCart, setAddingToCart] = useState<number | null>(null)
+  const [selectedVariations, setSelectedVariations] = useState<Record<number, string>>({})
 
-  const handleAddToCart = async (product: (typeof fishProducts)[0]) => {
+  const handleAddToCart = async (product: Product) => {
+    // If product has variations, check if one is selected
+    if (product.variations && product.variations.length > 0) {
+      const selectedVariationId = selectedVariations[product.id]
+      if (!selectedVariationId) {
+        return
+      }
+    }
+
     setAddingToCart(product.id)
 
     try {
+      let finalPrice = product.price
+      let finalName = product.name
+      let variationDetails = ""
+
+      // If product has variations, get the selected one
+      if (product.variations && product.variations.length > 0) {
+        const selectedVariationId = selectedVariations[product.id]
+        const selectedVariation = product.variations.find((v) => v.id === selectedVariationId)
+        if (selectedVariation) {
+          finalPrice = selectedVariation.price
+          finalName = `${product.name} - ${selectedVariation.label}`
+          variationDetails = selectedVariation.details
+        }
+      }
+
       await addItem({
-        id: product.id,
-        name: product.name,
-        price: product.price,
+        id: `${product.id}-${selectedVariations[product.id] || "default"}`,
+        name: finalName,
+        price: finalPrice,
         image: product.image,
-        description: product.description,
+        description: `${product.description}${variationDetails ? ` (${variationDetails})` : ""}`,
         origin: product.origin,
       })
     } catch (error) {
@@ -113,21 +190,55 @@ export default function ProductsPage() {
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-serif font-semibold text-xl text-card-foreground">{product.name}</h3>
-                  <Badge variant={product.availability === "In Stock" ? "default" : "secondary"}>
+              <div className="p-6 flex flex-col">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-sans font-semibold text-lg text-card-foreground leading-tight">{product.name}</h3>
+                  <Badge variant={product.availability === "In Stock" ? "default" : "secondary"} className="ml-2 flex-shrink-0">
                     {product.availability}
                   </Badge>
                 </div>
-                <p className="text-muted-foreground mb-2">{product.description}</p>
-                <p className="text-sm text-muted-foreground mb-4">Origin: {product.origin}</p>
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-2xl text-primary">{product.price}</span>
+                <p className="font-sans text-sm text-muted-foreground mb-2 leading-relaxed">{product.description}</p>
+                <p className="font-sans text-xs text-muted-foreground mb-4">Origin: {product.origin}</p>
+
+                {/* Product Variations */}
+                {product.variations && product.variations.length > 0 && (
+                  <div className="mb-4">
+                    <label className="font-sans text-xs font-medium text-foreground mb-2 block">Select Option</label>
+                    <Select
+                      value={selectedVariations[product.id] || ""}
+                      onValueChange={(value) => setSelectedVariations({ ...selectedVariations, [product.id]: value })}
+                    >
+                      <SelectTrigger className="w-full font-sans">
+                        <SelectValue placeholder="Choose a variation" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {product.variations.map((variation) => (
+                          <SelectItem key={variation.id} value={variation.id} className="font-sans">
+                            {variation.label} - ₦{variation.price} ({variation.details})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
+                  <span className="font-sans font-bold text-xl text-primary">
+                    ₦
+                    {selectedVariations[product.id]
+                      ? product.variations?.find((v) => v.id === selectedVariations[product.id])?.price ||
+                        product.price.replace(/[^0-9]/g, "")
+                      : product.price.replace(/[^0-9]/g, "")}
+                  </span>
                   <Button
                     size="sm"
                     onClick={() => handleAddToCart(product)}
-                    disabled={addingToCart === product.id || product.availability !== "In Stock"}
+                    disabled={
+                      addingToCart === product.id ||
+                      product.availability !== "In Stock" ||
+                      (product.variations && product.variations.length > 0 && !selectedVariations[product.id])
+                    }
+                    className="font-sans"
                   >
                     {addingToCart === product.id ? "Adding..." : "Add to Cart"}
                   </Button>

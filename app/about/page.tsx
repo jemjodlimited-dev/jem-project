@@ -44,13 +44,39 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
-            <div className="relative">
-              <img
-                src="/owner.jpg"
-                alt="Fresh fish market display"
-                className="rounded-lg shadow-lg w-full h-80 object-cover"
-              />
-              <h6 className="text-2xl text-center font-serif font-bold text-foreground mb-6">Mrs Darasimi Olagunju</h6>
+            <div className="space-y-8">
+              <div className="relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl blur-2xl opacity-75"></div>
+                <img
+                  src="/owner.jpg"
+                  alt="Mrs Darasimi Olagunju"
+                  className="relative rounded-2xl shadow-2xl w-full h-96 object-cover ring-1 ring-primary/10"
+                />
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-3xl font-serif font-bold text-foreground mb-1">Mrs Darasimi Olagunju</h3>
+                  <p className="text-primary font-sans font-semibold">Food Scientist & Founder</p>
+                </div>
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                  <p className="font-sans">
+                    Darasimi Olagunju is a food scientist who specializes in food processing and storage technology. She graduated from Joseph Ayo Babalola University with both her bachelor's and master's degrees, bringing scientific rigor to every product we create.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div className="border-l-4 border-primary pl-4">
+                      <p className="font-sans font-semibold text-sm text-foreground mb-1">Professional Background</p>
+                      <p className="text-sm">Trained by NAFDAC (2014) and served with the Federal Institute of Research Oshodi (FIIRO)</p>
+                    </div>
+                    <div className="border-l-4 border-primary pl-4">
+                      <p className="font-sans font-semibold text-sm text-foreground mb-1">Credentials</p>
+                      <p className="text-sm">Registered member of the Nigerian Institute of Food Science and Technology (NIFST)</p>
+                    </div>
+                  </div>
+                  <p className="font-sans pt-2">
+                    With her expertise in food technology and preservation, Darasimi brings scientific excellence to JEMJOD Limited's products, ensuring every item meets the highest standards of quality and food safety.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

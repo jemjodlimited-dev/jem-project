@@ -4,63 +4,52 @@ export async function POST(request: NextRequest) {
   try {
     const orderData = await request.json()
 
-    // In a real application, you would:
-    // 1. Save the order to your database
-    // 2. Send email using a service like Nodemailer, SendGrid, or Resend
-    // 3. Process payment
-    // 4. Send confirmation emails
+    const subtotal = orderData.totalPrice
+    const tax = Math.round(subtotal * 0.08)
+    const total = Math.round(subtotal * 1.08)
 
-    // For this demo, we'll simulate the email sending
-    console.log("Order received:", orderData)
+    // Format items as a simple list with line breaks for email templates
+    const itemsText = orderData.items
+      .map(
+        (item: any) =>
+          `${item.name} x${item.quantity} - ₦${(parseInt(item.price.replace(/[^0-9]/g, "")) * item.quantity).toLocaleString()}`
+      )
+      .join("\n")
 
-    // Simulate email content
-    const emailContent = `
-      New Order Received!
-      
-      Customer Details:
-      - Name: ${orderData.customer.fullName}
-      - Email: ${orderData.customer.email}
-      - Phone: ${orderData.customer.phone}
-      - Address: ${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.zipCode}, ${orderData.customer.country}
-      
-      Order Items:
-      ${orderData.items.map((item: any) => `- ${item.name} x${item.quantity} - $${(item.price * item.quantity).toFixed(2)}`).join("\n")}
-      
-      Total: $${orderData.totalWithTax.toFixed(2)}
-      Order Date: ${new Date(orderData.orderDate).toLocaleString()}
-    `
+    // Return individual data fields for EmailJS templates
+    const emailData = {
+      success: true,
+      message: "Order submitted successfully. Confirmation email will be sent shortly.",
+      // Customer Information
+      customer_name: orderData.customer.fullName,
+      customer_email: orderData.customer.email,
+      customer_phone: orderData.customer.phone,
+      customer_address: orderData.customer.address,
+      customer_city: orderData.customer.city,
+      customer_zip: orderData.customer.zipCode,
+      customer_country: orderData.customer.country,
+      // Order Details
+      items_list: itemsText,
+      subtotal: subtotal.toLocaleString(),
+      tax: tax.toLocaleString(),
+      total: total.toLocaleString(),
+      order_date: new Date(orderData.orderDate).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      // Full address for convenience
+      full_address: `${orderData.customer.address}, ${orderData.customer.city}, ${orderData.customer.zipCode}, ${orderData.customer.country}`,
+    }
 
-    console.log("Email content:", emailContent)
-
-    // Here you would integrate with your email service
-    // Example with Nodemailer:
-    /*
-    const transporter = nodemailer.createTransporter({
-      // your email configuration
-    })
-
-    await transporter.sendMail({
-      from: process.env.FROM_EMAIL,
-      to: process.env.ADMIN_EMAIL,
-      subject: `New Order from ${orderData.customer.fullName}`,
-      text: emailContent,
-    })
-
-    // Send confirmation email to customer
-    await transporter.sendMail({
-      from: process.env.FROM_EMAIL,
-      to: orderData.customer.email,
-      subject: 'Order Confirmation - StyleHub',
-      text: `Thank you for your order! We'll process it shortly.`,
-    })
-    */
-
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    return NextResponse.json({ success: true, message: "Order submitted successfully" })
+    return NextResponse.json(emailData)
   } catch (error) {
-    console.error("Error processing order:", error)
-    return NextResponse.json({ success: false, message: "Failed to process order" }, { status: 500 })
+    console.error("[v0] Error processing order:", error)
+    return NextResponse.json(
+      { success: false, message: "Failed to process order" },
+      { status: 500 }
+    )
   }
 }

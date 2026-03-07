@@ -2,12 +2,14 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import emailjs from "@emailjs/browser"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useCart } from "@/hooks/use-cart"
 import { Loader2, CheckCircle } from "lucide-react"
 
@@ -35,6 +37,13 @@ export function CheckoutForm() {
     country: "",
   })
 
+  // Initialize EmailJS
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
+      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+    }
+  }, [])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -45,6 +54,12 @@ export function CheckoutForm() {
 
     if (items.length === 0) {
       alert("Your cart is empty!")
+      return
+    }
+
+    // Validate form
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.address || !formData.city || !formData.zipCode || !formData.country) {
+      alert("Please fill in all required fields")
       return
     }
 
@@ -60,7 +75,7 @@ export function CheckoutForm() {
         orderDate: new Date().toISOString(),
       }
 
-      // Send email via API route
+      // Get email HTML from API route
       const response = await fetch("/api/send-order", {
         method: "POST",
         headers: {
@@ -69,7 +84,53 @@ export function CheckoutForm() {
         body: JSON.stringify(orderData),
       })
 
+      const data = await response.json()
+
       if (response.ok) {
+        // Send customer confirmation email
+        try {
+          await emailjs.send(
+            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+            process.env.NEXT_PUBLIC_EMAILJS_CUSTOMER_TEMPLATE_ID || "",
+            {
+              to_email: formData.email,
+              customer_name: data.customer_name,
+              customer_email: data.customer_email,
+              customer_phone: data.customer_phone,
+              customer_address: data.full_address,
+              items_list: data.items_list,
+              subtotal: data.subtotal,
+              tax: data.tax,
+              total: data.total,
+              order_date: data.order_date,
+            }
+          )
+        } catch (emailError) {
+          // Email sending failed but order was still submitted
+        }
+
+        // Send admin notification email
+        try {
+          await emailjs.send(
+            process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+            process.env.NEXT_PUBLIC_EMAILJS_ADMIN_TEMPLATE_ID || "",
+            {
+              to_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
+              customer_name: data.customer_name,
+              customer_email: data.customer_email,
+              customer_phone: data.customer_phone,
+              customer_address: data.full_address,
+              items_list: data.items_list,
+              subtotal: data.subtotal,
+              tax: data.tax,
+              total: data.total,
+              order_date: data.order_date,
+            }
+          )
+        } catch (emailError) {
+          // Email sending failed but order was still submitted
+        }
+
         setIsSuccess(true)
         clearCart()
         // Reset form
@@ -83,39 +144,50 @@ export function CheckoutForm() {
           country: "",
         })
       } else {
-        throw new Error("Failed to submit order")
+        throw new Error(data.message || "Failed to submit order")
       }
     } catch (error) {
-      console.error("Order submission error:", error)
       alert("There was an error submitting your order. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (isSuccess) {
-    return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-8 h-8 text-primary" />
+  return (
+    <>
+      <Dialog open={isSuccess} onOpenChange={() => {
+        if (!isSuccess) setIsSuccess(false)
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
             </div>
-            <h3 className="font-serif font-semibold text-xl">Order Submitted!</h3>
-            <p className="text-muted-foreground">
-              Thank you for your order. We'll send you a confirmation email shortly.
-            </p>
-            <Button asChild>
-              <a href="/products">Continue Shopping</a>
+            <DialogTitle className="text-center font-serif text-2xl">Order Submitted Successfully!</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Thank you for your order. A confirmation email has been sent to <strong>{formData.email || 'your email'}</strong>. We'll process your order shortly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-6">
+            <Button onClick={() => {
+              setIsSuccess(false)
+              window.location.href = "/products"
+            }} className="w-full">
+              Continue Shopping
+            </Button>
+            <Button onClick={() => {
+              setIsSuccess(false)
+              window.location.href = "/"
+            }} variant="outline" className="w-full">
+              Back to Home
             </Button>
           </div>
-        </CardContent>
-      </Card>
-    )
-  }
+        </DialogContent>
+      </Dialog>
 
-  return (
-    <Card>
+      <Card>
       <CardHeader>
         <CardTitle className="font-serif text-xl">Checkout Details</CardTitle>
       </CardHeader>
@@ -213,15 +285,15 @@ export function CheckoutForm() {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between text-sm">
                 <span>Subtotal:</span>
-                <span>₦{totalPrice.toFixed(2)}</span>
+                <span>₦{totalPrice.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Tax:</span>
-                <span>₦{(totalPrice * 0.08).toFixed(2)}</span>
+                <span>₦{Math.round(totalPrice * 0.08).toLocaleString()}</span>
               </div>
               <div className="flex justify-between font-semibold">
                 <span>Total:</span>
-                <span>₦{(totalPrice * 1.08).toFixed(2)}</span>
+                <span>₦{Math.round(totalPrice * 1.08).toLocaleString()}</span>
               </div>
             </div>
 
@@ -239,5 +311,6 @@ export function CheckoutForm() {
         </form>
       </CardContent>
     </Card>
+    </>
   )
 }

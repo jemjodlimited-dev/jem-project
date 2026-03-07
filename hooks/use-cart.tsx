@@ -85,8 +85,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const totalPrice = items.reduce((sum, item) => {
-    const priceNumber = Number.parseInt(item.price.replace(/[₹,/kg]/g, ""))
-    return sum + priceNumber * item.quantity
+    // Extract numeric value from price strings like "2,000", "16,000/kg", etc.
+    const priceNumber = parseInt(item.price.replace(/[^0-9]/g, ""), 10) || 0
+    return sum + (isNaN(priceNumber) ? 0 : priceNumber * item.quantity)
   }, 0)
 
   return (

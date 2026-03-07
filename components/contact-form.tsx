@@ -2,106 +2,133 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import emailjs from "@emailjs/browser"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Loader2, CheckCircle } from "lucide-react"
 
-interface OrderFormData {
+interface EnquiryFormData {
   name: string
   email: string
   phone: string
-  fishType: string
-  quantity: string
-  deliveryDate: string
-  address: string
   message: string
 }
 
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
-  const [formData, setFormData] = useState<OrderFormData>({
+  const [formData, setFormData] = useState<EnquiryFormData>({
     name: "",
     email: "",
     phone: "",
-    fishType: "",
-    quantity: "",
-    deliveryDate: "",
-    address: "",
     message: "",
   })
+
+  // Initialize EmailJS
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY) {
+      emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY)
+    }
+  }, [])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
+      alert("Please fill in all required fields")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Send enquiry email
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+        process.env.NEXT_PUBLIC_EMAILJS_ENQUIRY_TEMPLATE_ID || "",
+        {
+          to_email: process.env.NEXT_PUBLIC_ADMIN_EMAIL || "",
+          visitor_name: formData.name,
+          visitor_email: formData.email,
+          visitor_phone: formData.phone,
+          visitor_message: formData.message,
+          submission_date: new Date().toLocaleString(),
+        }
+      )
 
-      console.log("Fish order submitted:", formData)
+      // Send confirmation email to visitor
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || "",
+        process.env.NEXT_PUBLIC_EMAILJS_ENQUIRY_CONFIRM_TEMPLATE_ID || "",
+        {
+          to_email: formData.email,
+          visitor_name: formData.name,
+          visitor_message: formData.message,
+        }
+      )
+
       setIsSuccess(true)
-
       // Reset form
       setFormData({
         name: "",
         email: "",
         phone: "",
-        fishType: "",
-        quantity: "",
-        deliveryDate: "",
-        address: "",
         message: "",
       })
     } catch (error) {
-      console.error("Order form error:", error)
-      alert("There was an error submitting your order. Please try again.")
+      console.error("Enquiry form error:", error)
+      alert("There was an error submitting your enquiry. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (isSuccess) {
-    return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="font-serif font-semibold text-xl">Order Received!</h3>
-            <p className="text-muted-foreground">
-              Thank you for your order. We'll contact you within 2 hours to confirm availability and delivery details.
-            </p>
-            <Button onClick={() => setIsSuccess(false)}>Place Another Order</Button>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
+
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-serif text-xl">Place Your Fish Order</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <>
+      <Dialog open={isSuccess} onOpenChange={() => {
+        if (!isSuccess) setIsSuccess(false)
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+            </div>
+            <DialogTitle className="text-center font-serif text-2xl">Enquiry Submitted!</DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              Thank you for your enquiry. We have received your message and will get back to you as soon as possible. A confirmation email has been sent to <strong>{formData.email}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-6">
+            <Button onClick={() => {
+              setIsSuccess(false)
+              window.location.href = "/"
+            }} className="w-full">
+              Back to Home
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-serif text-2xl">Send us an Enquiry</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
               <Input
@@ -110,12 +137,25 @@ export function ContactForm() {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                placeholder="Your name"
+                placeholder="Your full name"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone *</Label>
+              <Label htmlFor="email">Email *</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                placeholder="your.email@example.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number *</Label>
               <Input
                 id="phone"
                 name="phone"
@@ -125,106 +165,33 @@ export function ContactForm() {
                 placeholder="+2349033447991"
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="your.email@example.com"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fishType">Fish Type *</Label>
-              <Select onValueChange={(value) => handleSelectChange("fishType", value)} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select fish type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="salmon">Atlantic Salmon</SelectItem>
-                  <SelectItem value="seabass">Sea Bass</SelectItem>
-                  <SelectItem value="prawns">King Prawns</SelectItem>
-                  <SelectItem value="tuna">Tuna Steaks</SelectItem>
-                  <SelectItem value="pomfret">Pomfret</SelectItem>
-                  <SelectItem value="crab">Mud Crab</SelectItem>
-                  <SelectItem value="other">Other (specify in message)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity *</Label>
-              <Input
-                id="quantity"
-                name="quantity"
-                value={formData.quantity}
+              <Label htmlFor="message">Message *</Label>
+              <Textarea
+                id="message"
+                name="message"
+                value={formData.message}
                 onChange={handleInputChange}
                 required
-                placeholder="e.g., 2 kg, 5 pieces"
+                placeholder="Tell us about your enquiry..."
+                rows={5}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="deliveryDate">Preferred Delivery Date *</Label>
-            <Input
-              id="deliveryDate"
-              name="deliveryDate"
-              type="date"
-              value={formData.deliveryDate}
-              onChange={handleInputChange}
-              required
-              min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="address">Delivery Address *</Label>
-            <Textarea
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleInputChange}
-              required
-              placeholder="Full delivery address with pincode"
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="message">Special Instructions</Label>
-            <Textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleInputChange}
-              placeholder="Any special requirements, cleaning instructions, or other requests"
-              rows={3}
-            />
-          </div>
-
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Submitting Order...
-              </>
-            ) : (
-              "Submit Order Request"
-            )}
-          </Button>
-
-          <p className="text-sm text-muted-foreground text-center">
-            * We'll contact you within 2 hours to confirm availability and provide total cost
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Send Enquiry"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </>
   )
 }
