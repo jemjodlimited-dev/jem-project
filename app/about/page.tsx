@@ -47,10 +47,23 @@ export default function AboutPage() {
             <div className="relative">
               <img
                 src="/owner.jpg"
-                alt="Fresh fish market display"
+                alt="Mrs Darasimi Olagunju"
                 className="rounded-lg shadow-lg w-full h-80 object-cover"
               />
-              <h6 className="text-2xl text-center font-serif font-bold text-foreground mb-6">Mrs Darasimi Olagunju</h6>
+              <div className="mt-6">
+                <h3 className="text-2xl text-center font-serif font-bold text-foreground mb-3">Mrs Darasimi Olagunju</h3>
+                <div className="space-y-3 text-muted-foreground">
+                  <p className="text-sm">
+                    Darasimi Olagunju is a food scientist who specializes in food processing and storage technology. She graduated from Joseph Ayo Babalola University with both her bachelor's and master's degrees.
+                  </p>
+                  <p className="text-sm">
+                    She was trained by NAFDAC in 2014 and has rendered her service to the country through the Federal Institute of Research Oshodi (FIIRO). She is a registered member of the Nigerian Institute of Food Science and Technology (NIFST).
+                  </p>
+                  <p className="text-sm">
+                    Darasimi uses her expertise to technologically process and preserve healthy food, bringing scientific excellence to JEMJOD Limited's products and ensuring that every item meets the highest standards of quality and food safety.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
