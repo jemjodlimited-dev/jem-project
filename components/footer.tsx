@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Phone, Mail, MapPin, Clock, Fish } from "lucide-react"
+import { Phone, Mail, MapPin, Clock } from "lucide-react"
 
 export default function Footer() {
   return (
@@ -9,11 +9,10 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Fish className="h-8 w-8 text-emerald-400" />
               <span className="text-2xl font-bold font-serif">JEMJOD</span>
             </div>
             <p className="text-slate-300 text-sm leading-relaxed">
-              Your trusted source for premium fresh fish and seafood. Daily catches delivered with quality guaranteed.
+              Your trusted source for premium preserved foods. Technologically processed and preserved with quality guaranteed.
             </p>
           </div>
 
@@ -26,11 +25,11 @@ export default function Footer() {
                   Home
                 </Link>
               </li>
-              <li>
-                <Link href="/products" className="text-slate-300 hover:text-emerald-400 transition-colors">
-                  Fresh Fish
-                </Link>
-              </li>
+            <li>
+              <Link href="/products" className="text-slate-300 hover:text-emerald-400 transition-colors">
+                Products
+              </Link>
+            </li>
               <li>
                 <Link href="/cart" className="text-slate-300 hover:text-emerald-400 transition-colors">
                   Cart

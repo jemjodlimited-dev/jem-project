@@ -19,8 +19,8 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "JEMJOD - Premium Enjoyment",
-  description: "Daily fresh fish, seafood, and raw food delivered to your door. Quality guaranteed.",
+  title: "JEMJOD - Premium Preserved Foods",
+  description: "Technologically processed and preserved foods delivered to your door. Premium quality guaranteed.",
  
 }
 

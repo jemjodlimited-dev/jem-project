@@ -1,4 +1,4 @@
-import { Fish, Clock, Award, Users, Truck, Heart } from "lucide-react"
+import { Clock, Award, Users, Truck, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
@@ -10,9 +10,6 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative py-20 px-4 bg-gradient-to-br from-primary/5 to-primary/10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <Fish className="w-8 h-8 text-primary-foreground" />
-          </div>
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6 text-balance">
             About JEMJOD
           </h1>
@@ -30,17 +27,14 @@ export default function AboutPage() {
               <h2 className="text-3xl font-serif font-bold text-foreground mb-6">Our Story</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Founded in 2019, JEMJOD Limited began as a small family business with a simple mission: to bring the
-                  freshest, highest-quality fish and seafood directly from local fishermen to your table.
+                  Founded in 2019, JEMJOD Limited began as a small family business with a simple mission: to bring the highest-quality, technologically preserved foods directly to your table.
                 </p>
                 <p>
-                  What started as a single stall in the local market has grown into a trusted name in fresh seafood,
-                  serving thousands of families across the region. We maintain the same commitment to quality and
-                  freshness that our founders established nearly four decades ago.
+                  What started as a single stall in the local market has grown into a trusted name in preserved foods,
+                  serving thousands of families across the region. We maintain the same commitment to quality and excellence that our founders established nearly four decades ago.
                 </p>
                 <p>
-                  Every morning before dawn, our team works with local fishermen to select only the finest catch of the
-                  day, ensuring that what reaches your kitchen is as fresh as the ocean breeze.
+                  Every day, our team works meticulously to process and preserve foods using advanced food technology, ensuring that what reaches your kitchen maintains the highest standards of safety, nutrition, and taste.
                 </p>
               </div>
             </div>
