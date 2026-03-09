@@ -71,7 +71,7 @@ export function CheckoutForm() {
         customer: formData,
         items: items,
         totalPrice: totalPrice,
-        totalWithTax: totalPrice * 1.08,
+        totalWithTax: totalPrice * 1.075,
         orderDate: new Date().toISOString(),
       }
 
@@ -289,11 +289,11 @@ export function CheckoutForm() {
               </div>
               <div className="flex justify-between text-sm">
                 <span>Tax:</span>
-                <span>₦{Math.round(totalPrice * 0.08).toLocaleString()}</span>
+                <span>₦{Math.round(totalPrice * 0.075).toLocaleString()}</span>
               </div>
               <div className="flex justify-between font-semibold">
                 <span>Total:</span>
-                <span>₦{Math.round(totalPrice * 1.08).toLocaleString()}</span>
+                <span>₦{Math.round(totalPrice * 1.075).toLocaleString()}</span>
               </div>
             </div>
 

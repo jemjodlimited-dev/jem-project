@@ -5,8 +5,8 @@ export async function POST(request: NextRequest) {
     const orderData = await request.json()
 
     const subtotal = orderData.totalPrice
-    const tax = Math.round(subtotal * 0.08)
-    const total = Math.round(subtotal * 1.08)
+    const tax = Math.round(subtotal * 0.075)
+    const total = Math.round(subtotal * 1.075)
 
     // Format items as a simple list with line breaks for email templates
     const itemsText = orderData.items

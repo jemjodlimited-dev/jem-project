@@ -91,12 +91,12 @@ export function CartSummary() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Tax</span>
-              <span>₦{Math.round(totalPrice * 0.08).toLocaleString()}</span>
+              <span>₦{Math.round(totalPrice * 0.075).toLocaleString()}</span>
             </div>
             <div className="border-t border-border pt-2">
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>₦{Math.round(totalPrice * 1.08).toLocaleString()}</span>
+                <span>₦{Math.round(totalPrice * 1.075).toLocaleString()}</span>
               </div>
             </div>
           </div>
